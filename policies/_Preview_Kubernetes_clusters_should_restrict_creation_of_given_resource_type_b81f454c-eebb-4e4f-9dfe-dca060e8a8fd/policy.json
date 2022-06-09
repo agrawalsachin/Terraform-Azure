@@ -1,0 +1,101 @@
+{
+ "properties": {
+  "displayName": "[Preview]: Kubernetes clusters should restrict creation of given resource type",
+  "policyType": "BuiltIn",
+  "mode": "Microsoft.Kubernetes.Data",
+  "description": "Given Kubernetes resource type should not be deployed in certain namespace.",
+  "metadata": {
+   "version": "1.1.0-preview",
+   "category": "Kubernetes",
+   "preview": true
+  },
+  "parameters": {
+   "effect": {
+    "type": "String",
+    "metadata": {
+     "displayName": "Effect",
+     "description": "'Audit' allows a non-compliant resource to be created or updated, but flags it as non-compliant. 'Deny' blocks the non-compliant resource creation or update. 'Disabled' turns off the policy."
+    },
+    "allowedValues": [
+     "Audit",
+     "Deny",
+     "Disabled"
+    ],
+    "defaultValue": "Audit"
+   },
+   "excludedNamespaces": {
+    "type": "Array",
+    "metadata": {
+     "displayName": "Namespace exclusions",
+     "description": "List of Kubernetes namespaces to exclude from policy evaluation. System namespaces \"kube-system\", \"gatekeeper-system\" and \"azure-arc\" are always excluded by design."
+    },
+    "defaultValue": [
+     "kube-system",
+     "gatekeeper-system",
+     "azure-arc"
+    ]
+   },
+   "namespaces": {
+    "type": "Array",
+    "metadata": {
+     "displayName": "Namespace inclusions",
+     "description": "List of Kubernetes namespaces to only include in policy evaluation. An empty list means the policy is applied to all resources in all namespaces."
+    }
+   },
+   "labelSelector": {
+    "type": "Object",
+    "metadata": {
+     "displayName": "Kubernetes label selector",
+     "description": "Label query to select Kubernetes resources for policy evaluation. An empty label selector matches all Kubernetes resources."
+    },
+    "defaultValue": {}
+   },
+   "kind": {
+    "type": "String",
+    "metadata": {
+     "displayName": "Resource Kind",
+     "description": "Kubernetes resource kind to enforce annotations for. One assignment can only restrict single resource kind. It is case-sensitive, please start with upper case. For example \"Pod\""
+    }
+   },
+   "apiGroups": {
+    "type": "Array",
+    "metadata": {
+     "displayName": "Resource api group",
+     "description": "Kubernetes resource api group to enforce annotations for. Emtpy array refers no api group restriction"
+    },
+    "defaultValue": [
+     ""
+    ]
+   }
+  },
+  "policyRule": {
+   "if": {
+    "field": "type",
+    "in": [
+     "AKS Engine",
+     "Microsoft.Kubernetes/connectedClusters",
+     "Microsoft.ContainerService/managedClusters"
+    ]
+   },
+   "then": {
+    "effect": "[parameters('effect')]",
+    "details": {
+     "templateInfo": {
+      "sourceType": "PublicURL",
+      "url": "https://store.policy.core.windows.net/kubernetes/block-resource/v1/template.yaml"
+     },
+     "apiGroups": "[parameters('apiGroups')]",
+     "kinds": [
+      "[parameters('kind')]"
+     ],
+     "excludedNamespaces": "[parameters('excludedNamespaces')]",
+     "namespaces": "[parameters('namespaces')]",
+     "labelSelector": "[parameters('labelSelector')]"
+    }
+   }
+  }
+ },
+ "id": "/providers/Microsoft.Authorization/policyDefinitions/b81f454c-eebb-4e4f-9dfe-dca060e8a8fd",
+ "type": "Microsoft.Authorization/policyDefinitions",
+ "name": "b81f454c-eebb-4e4f-9dfe-dca060e8a8fd"
+}
